@@ -9,6 +9,8 @@ import docx
 import io
 import numpy as np
 import replicate
+import PyPDF2
+from docx import Document
 
 
 # Set your Together API key
@@ -45,16 +47,32 @@ def parse_file(file):
         return df, "table"
     elif name.endswith((".txt", ".log", ".md")):
         return file.read().decode("utf-8"), "text"
+    elif name.endswith(".pdf"):
+        try:
+            pdf_reader = PyPDF2.PdfReader(file)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() + "\n"
+            return text, "text"
+        except Exception as e:
+            st.error(f"Error reading PDF: {str(e)}")
+            return None, None
+    elif name.endswith(".docx"):
+        try:
+            doc = Document(file)
+            text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+            return text, "text"
+        except Exception as e:
+            st.error(f"Error reading DOCX: {str(e)}")
+            return None, None
     elif name.endswith((".png", ".jpg", ".jpeg")):
         img = Image.open(file)
-        # Initialize EasyOCR reader
         reader = easyocr.Reader(['en'])
-        # Use readtext() instead of image_to_string()
         result = reader.readtext(np.array(img))
-        # Extract text from results
         text = ' '.join([item[1] for item in result])
         return text, "text"
     else:
+        st.error(f"Unsupported file type: {name}")
         return None, None
 
 

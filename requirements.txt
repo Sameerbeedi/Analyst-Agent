@@ -2,9 +2,10 @@ streamlit
 pandas
 matplotlib
 openpyxl
-python-docx
+python-docx==0.8.11
 pdfplumber
 easyocr
 Pillow
 together
 replicate
+PyPDF2==3.0.1
