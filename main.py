@@ -8,7 +8,7 @@ import PyPDF2
 from docx import Document
 
 
-# Set your Together API key
+# API Configuration
 together.api_key = "6bf3732aa602bd98b4f7600e7b8e53d1bb3e4cb1a2fc9d6952c10593ea67e0d7" 
 
 # Initialize EasyOCR Reader
@@ -24,7 +24,12 @@ def ask_llama(prompt):
             temperature=0.7,
             top_p=0.95,
         )
-        return response['output']['choices'][0]['text'].strip()
+        # Correct response parsing
+        if response and 'choices' in response:
+            return response['choices'][0]['text'].strip()
+        else:
+            st.error("Unexpected response format from Together AI")
+            return None
     except Exception as e:
         st.error(f"Error communicating with Together AI: {str(e)}")
         return None
