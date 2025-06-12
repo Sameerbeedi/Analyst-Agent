@@ -24,7 +24,8 @@ def ask_llama(prompt):
         temperature=0.7,
         top_p=0.9
     )
-    return response['output']['choices'][0]['text'].strip()
+    return response['output'].strip()
+
 
 # Function to parse uploaded file
 def parse_file(file):
