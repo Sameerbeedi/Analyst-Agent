@@ -6,6 +6,7 @@ from PIL import Image
 import easyocr
 import PyPDF2
 from docx import Document
+import matplotlib.pyplot as plt
 
 
 # API Configuration
@@ -73,13 +74,24 @@ def parse_file(file):
 
 
 # Function to generate plots
-def generate_plot(df, x_col, y_col):
-    fig, ax = plt.subplots()
-    ax.plot(df[x_col], df[y_col], marker='o')
-    ax.set_xlabel(x_col)
-    ax.set_ylabel(y_col)
-    ax.set_title(f"{y_col} vs {x_col}")
-    st.pyplot(fig)
+def generate_plot(data, x_col, y_col):
+    try:
+        fig, ax = plt.subplots()
+        if isinstance(data, pd.DataFrame):
+            data.plot(x=x_col, y=y_col, ax=ax)
+        else:
+            st.error("Data must be a pandas DataFrame for plotting")
+            return
+        
+        plt.xlabel(x_col)
+        plt.ylabel(y_col)
+        plt.title(f"{y_col} vs {x_col}")
+        
+        # Display plot in Streamlit
+        st.pyplot(fig)
+        plt.close()
+    except Exception as e:
+        st.error(f"Error generating plot: {str(e)}")
 
 # Streamlit UI
 st.set_page_config(page_title="Data Analyst Agent", layout="wide")
