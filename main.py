@@ -10,7 +10,7 @@ import io
 import numpy as np
 
 # Set your Together API key
-together.api_key = "6bf3732aa602bd98b4f7600e7b8e53d1bb3e4cb1a2fc9d6952c10593ea67e0d7"  # Replace with your actual key
+together.api_key = "6bf3732aa602bd98b4f7600e7b8e53d1bb3e4cb1a2fc9d6952c10593ea67e0d7" 
 
 # Initialize EasyOCR Reader
 reader = easyocr.Reader(['en'])
@@ -30,24 +30,19 @@ def ask_llama(prompt):
 # Function to parse uploaded file
 def parse_file(file):
     name = file.name.lower()
-    if name.endswith(".csv"):
-        return pd.read_csv(file), "table"
-    elif name.endswith(".xlsx"):
-        return pd.read_excel(file), "table"
-    elif name.endswith(".pdf"):
-        with pdfplumber.open(file) as pdf:
-            text = '\n'.join([page.extract_text() or "" for page in pdf.pages])
-        return text, "text"
-    elif name.endswith(".docx"):
-        doc = docx.Document(file)
-        text = '\n'.join([para.text for para in doc.paragraphs])
-        return text, "text"
-    elif name.endswith(".txt"):
+    if name.endswith((".csv", ".xlsx")):
+        df = pd.read_csv(file) if name.endswith(".csv") else pd.read_excel(file)
+        return df, "table"
+    elif name.endswith((".txt", ".log", ".md")):
         return file.read().decode("utf-8"), "text"
     elif name.endswith((".png", ".jpg", ".jpeg")):
-        img = Image.open(file).convert("RGB")
+        img = Image.open(file)
+        # Initialize EasyOCR reader
+        reader = easyocr.Reader(['en'])
+        # Use readtext() instead of image_to_string()
         result = reader.readtext(np.array(img))
-        text = "\n".join([item[1] for item in result])
+        # Extract text from results
+        text = ' '.join([item[1] for item in result])
         return text, "text"
     else:
         return None, None
