@@ -11,6 +11,9 @@ import io
 # Set Together API key
 together.api_key = "6bf3732aa602bd98b4f7600e7b8e53d1bb3e4cb1a2fc9d6952c10593ea67e0d7"
 
+# Load easyocr reader once (not inside function)
+reader = easyocr.Reader(['en'])
+
 # Ask the LLaMA model via Together
 def ask_llama(prompt):
     response = together.Complete.create(
@@ -40,8 +43,12 @@ def parse_file(file):
     elif name.endswith(".txt"):
         return file.read().decode("utf-8"), "text"
     elif name.endswith((".png", ".jpg", ".jpeg")):
-        img = Image.open(file)
-        text = easyocr.image_to_string(img)
+        image = Image.open(file).convert("RGB")
+        image_bytes = io.BytesIO()
+        image.save(image_bytes, format='JPEG')
+        image_bytes = image_bytes.getvalue()
+        result = reader.readtext(image_bytes)
+        text = "\n".join([item[1] for item in result])
         return text, "text"
     else:
         return None, None
