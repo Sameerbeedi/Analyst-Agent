@@ -44,12 +44,13 @@ def parse_file(file):
     elif name.endswith(".txt"):
         return file.read().decode("utf-8"), "text"
     elif name.endswith((".png", ".jpg", ".jpeg")):
-        image = Image.open(file).convert("RGB")
-        result = reader.readtext(np.array(image))
+        img = Image.open(file).convert("RGB")
+        result = reader.readtext(np.array(img))
         text = "\n".join([item[1] for item in result])
         return text, "text"
     else:
         return None, None
+
 
 # Function to generate plots
 def generate_plot(df, x_col, y_col):
