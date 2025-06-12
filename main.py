@@ -1,14 +1,9 @@
 import streamlit as st
-import pandas as pd
-import pdfplumber
-import easyocr
 import together
-import matplotlib.pyplot as plt
-from PIL import Image
-import docx
-import io
+import pandas as pd
 import numpy as np
-import replicate
+from PIL import Image
+import easyocr
 import PyPDF2
 from docx import Document
 
@@ -22,20 +17,16 @@ reader = easyocr.Reader(['en'])
 # Function to ask LLaMA model via Together
 def ask_llama(prompt):
     try:
-        response = replicate.run(
-            "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-            input={
-                "prompt": prompt,
-                "max_tokens": 500,
-                "temperature": 0.7,
-                "top_p": 0.95,
-                "system_prompt": "You are a helpful AI assistant that provides accurate and concise answers."
-            }
+        response = together.Complete.create(
+            model="meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+            prompt=prompt,
+            max_tokens=500,
+            temperature=0.7,
+            top_p=0.95,
         )
-        # Join the response chunks into a single string
-        return ''.join(response).strip()
+        return response['output']['choices'][0]['text'].strip()
     except Exception as e:
-        st.error(f"Error communicating with LLaMA: {str(e)}")
+        st.error(f"Error communicating with Together AI: {str(e)}")
         return None
 
 
