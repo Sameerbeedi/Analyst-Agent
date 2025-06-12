@@ -95,7 +95,7 @@ def generate_plot(data, x_col, y_col):
 
 # Streamlit UI
 st.set_page_config(page_title="Data Analyst Agent", layout="wide")
-st.title("🧠 Data Analyst Agent (LLAMA-4 Maverick)")
+st.title("🧠 Data Analyst Agent")
 
 uploaded_file = st.file_uploader(
     "Upload a document (.csv, .xlsx, .pdf, .docx, .txt, image)",
