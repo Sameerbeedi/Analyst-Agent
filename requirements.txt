@@ -7,3 +7,4 @@ pdfplumber
 easyocr
 Pillow
 together
+replicate

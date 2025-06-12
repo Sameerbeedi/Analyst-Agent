@@ -8,6 +8,8 @@ from PIL import Image
 import docx
 import io
 import numpy as np
+import replicate
+
 
 # Set your Together API key
 together.api_key = "6bf3732aa602bd98b4f7600e7b8e53d1bb3e4cb1a2fc9d6952c10593ea67e0d7" 
@@ -17,14 +19,22 @@ reader = easyocr.Reader(['en'])
 
 # Function to ask LLaMA model via Together
 def ask_llama(prompt):
-    response = together.Complete.create(
-        prompt=prompt,
-        model="meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-        max_tokens=1024,
-        temperature=0.7,
-        top_p=0.9
-    )
-    return response['output'].strip()
+    try:
+        response = replicate.run(
+            "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+            input={
+                "prompt": prompt,
+                "max_tokens": 500,
+                "temperature": 0.7,
+                "top_p": 0.95,
+                "system_prompt": "You are a helpful AI assistant that provides accurate and concise answers."
+            }
+        )
+        # Join the response chunks into a single string
+        return ''.join(response).strip()
+    except Exception as e:
+        st.error(f"Error communicating with LLaMA: {str(e)}")
+        return None
 
 
 # Function to parse uploaded file
